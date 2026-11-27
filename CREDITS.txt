@@ -1,7 +1,12 @@
 溧阳慢游所网页体验版
 天目湖摄影：William Ng，2018 年；缩小与显示裁切。
 https://commons.wikimedia.org/wiki/File:Tianmu_Lake_20180625.jpg
+南山竹海静湖摄影：赵文博（风之清扬），缩小与显示裁切。
+https://commons.wikimedia.org/wiki/File:南山竹海之静湖.JPG
 照片（包括缩小版）：CC BY-SA 4.0，https://creativecommons.org/licenses/by-sa/4.0/
 原创合成配乐与音效；中文语音由 eSpeak NG 离线合成，没有调用在线服务。
+上述旧语音样本仅供试听。小溧互动优先使用设备本机的对应语种音色。
+小溧角色与骨骼为项目原创。Three.js 与 Three-VRM 许可证见 vendor/ 下各自 LICENSE。
 景点与档案来源随条目显示。无政府或景区合作声明。
 本机体验记录，不是正式服务器记录；积分不能兑换。
+本页不包含账户同步、实际商家目录、公共资讯审核、实时天气或运营后台。

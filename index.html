@@ -2,23 +2,28 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"><title>溧阳慢游所</title><link rel="icon" href="./experience-photo.jpg"><link rel="stylesheet" href="./experience.css">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><title>溧阳慢游所</title><link rel="icon" href="./experience-photo.jpg"><link rel="stylesheet" href="./experience.css">
 <script defer src="./experience-scene.js"></script><script defer src="./experience-puzzles.js"></script><script defer src="./offline.js"></script><script defer src="./experience.js"></script>
 </head>
 <body>
 <main id="phone" aria-label="溧阳慢游所">
+  <a href="#view" class="skip-content">跳到内容</a>
   <div id="world" class="world"><canvas id="land" aria-hidden="true"></canvas></div>
   <header class="tools">
     <a href="#home" class="wordmark">溧阳慢游所</a>
+    <a href="#visitor" id="visitor-language" class="utility-link" lang="en">Language</a>
+    <a href="#accessibility" id="access-link" class="utility-link">无障碍</a>
     <button id="mute" class="icon" aria-label="静音" title="静音"></button>
     <button id="full" class="icon desktop" aria-label="全屏" title="全屏"></button>
   </header>
-  <div id="view" class="view"></div>
+  <div id="view" class="view" role="region" aria-label="内容" tabindex="-1"></div>
+  <noscript><section class="view static-guide"><h1>溧阳慢游所</h1><p>启用 JavaScript 后可以使用本机导览、游戏和音频。</p><a href="./CREDITS.txt">素材署名与公开版说明</a></section></noscript>
   <nav class="tabs" aria-label="慢游导航">
-    <a href="#home" data-nav="home"><svg viewBox="0 0 24 24"><path d="m3 17 5-9 4 6 3-4 6 7H3Z"/></svg>慢游</a>
+    <a href="#home" data-nav="home"><svg viewBox="0 0 24 24"><path d="m3 17 5-9 4 6 3-4 6 7H3Z"/></svg>首页</a>
+    <a href="#map" data-nav="map"><svg viewBox="0 0 24 24"><path d="m3 6 6-2 6 2 6-2v14l-6 2-6-2-6 2zm6-2v14m6-12v14"/></svg>地图</a>
     <a href="#explore" data-nav="explore"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 4-4 2 2-4 4-2Z"/></svg>探索</a>
-    <a href="#culture" data-nav="culture"><svg viewBox="0 0 24 24"><path d="M3 9h18L12 4 3 9Zm2 12h14M7 10v8m5-8v8m5-8v8"/></svg>文化</a>
-    <a href="#passport" data-nav="passport"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="11" r="3"/><path d="M9 17h6"/></svg>护照</a>
+    <a href="#guide" data-nav="guide"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>导游</a>
+    <a href="#passport" data-nav="passport"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="11" r="3"/><path d="M9 17h6"/></svg>我的</a>
   </nav>
   <div id="toast" role="status" hidden></div>
 </main>
