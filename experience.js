@@ -463,8 +463,8 @@
       item.insertAdjacentHTML('afterbegin','<svg aria-hidden="true" viewBox="0 0 24 24"><path d="'+path+'"/></svg>');
       grid.append(item);
     }
+    grid.append(link('路线规划','#routes','action'));
     if(!hosted){
-      grid.append(link('路线规划','#routes','action'));
       const weather=el('p','天气查询中','muted');
       services.append(weather);
       api('weather').then(data=>{
@@ -651,7 +651,7 @@
     const sources=el('details','','guide-sources');sources.append(el('summary','查看讲解资料来源'));for(const src of place.sources||[])sources.append(link(src.label,src.url,'listing'));lecture.append(sources);panel.append(lecture);
     panel.append(el('h3','继续探索其他地点'));for(const item of places)panel.append(link(item.place,'#guide/'+item.id,'listing'));
     speakLocal(narration);
-    if(!hosted)panel.append(row(link('查找当地资料','#ask','action'),link('生成游玩路线','#routes'),link('全部城市服务','#services')));
+    panel.append(row(link('查找当地资料','#ask','action'),link('生成游玩路线','#routes'),link('全部城市服务','#services')));
   }
   const era={qin:'history',mask:'bamboo',museum:'road',craft:'tea'};
   async function culture(ticket,id){
@@ -741,7 +741,10 @@
     theme('village');
     const panel=sheet('吃住游目录');panel.classList.add('city-service-sheet');
     if(hosted){
-      panel.append(el('p','公开体验版未连接实时商家、住宿和路线目录。'),link('返回地点导览','#guide','action'));
+      panel.append(el('p','商家、住宿、活动和公共通知的在线目录暂未开放。可浏览已注明出处的景区资料，并在本机规划路线。'),
+        row(link('生成游玩路线','#routes','action'),link('我的行程','#journey')));
+      const guides=await api('travel/guide');if(ticket!==archive)return;
+      for(const guide of guides)panel.append(link(localeData?.places?.[guide.id]?.[0]||guide.place,'#guide/'+guide.id,'listing'));
       return;
     }
     const filters={all:'全部',attraction:'景点',food:'美食',lodging:'民宿',village:'乡村',route:'路线',merchant:'商家',event:'活动',culture:'文化',notice:'提醒'};
@@ -921,7 +924,7 @@
     const ticket=++archive;
     const [page,id,variant]=location.hash.slice(1).split('/');
     pulsePlaying=['','home','today'].includes(page||'');
-    const name=hosted&&offlineUnavailable.has('#'+page)?'offline':['visitor','accessibility','map','listening','explore','guide','culture','passport','directory','game','lab','outdoor','assistant','bridge','services','today','discover','preferences','jobs','learning','about','family','journey','field',...(!hosted?['account','work','ask','routes','study','reports','community','pages','cityops','smart']:[])].includes(page)?page:'home';
+    const name=hosted&&offlineUnavailable.has('#'+page)?'offline':['visitor','accessibility','map','listening','explore','guide','culture','passport','directory','game','lab','outdoor','assistant','bridge','services','today','discover','preferences','jobs','learning','about','family','journey','field','ask','routes','pages','smart',...(!hosted?['account','work','study','reports','community','cityops']:[])].includes(page)?page:'home';
     const localized=['home','map','visitor','accessibility','guide','assistant','preferences','services','culture','offline'].includes(name);
     $('view').lang=localized?locale:'zh-CN';
     $('view').setAttribute('aria-label',localized?translate(name==='guide'?'guideTitle':'visitor','内容'):'内容');
@@ -989,7 +992,7 @@
         const original=el('details');original.append(el('summary','中文指令与本地问答'));area.lang='zh-CN';area.replaceWith(original);original.append(area);
       }
       view.mountAssistant(area,{backend:!hosted,onSpeak:speakLocal,onStop:cancelVoice,
-        ...(!hosted&&{lookup:async question=>(await api('city/guide',{question})).records})});
+        lookup:async question=>(await api('city/guide',{question})).records});
     }
   }
   function field(name,label,{type='text',max=120,required=true}={}){
@@ -1192,7 +1195,7 @@
           else status.textContent='无法清除本机行程。';
         }));
       }else content.append(el('p','还没有保存行程。','city-empty'));
-      if(!hosted)content.append(link('规划路线','#routes','action'));
+      content.append(link('规划路线','#routes','action'));
       if(favorites.length){
         content.append(button('用收藏景点创建行程',()=>{
           if(saved&&!confirm('用收藏景点替换本机已保存的行程？'))return;
@@ -1265,11 +1268,11 @@
     ['居民与商家 · 城市服务','办理自己的事情', [['求职工具','本地简历与面试练习','#jobs','职'],['商家运营','资料提交与营销工作台','#work','商'],['信息纠错','提交错误与审核进度','#work','改'],['我的主题','偏好与个性化设置','#preferences','设'],['平台说明','隐私、来源与服务边界','#about','信'],['城市运营','真实数据与角色门禁','#cityops','管']]]
   ];
   const serviceLabels={merchant:'商家',food:'美食',route:'路线',event:'活动',culture:'文化',notice:'提醒',attraction:'景点',village:'乡村',lodging:'住宿',page:'公开页面'};
-  const offlineUnavailable=new Set(['#routes','#reports','#community','#pages','#work','#cityops','#ask','#study','#account','#smart']);
+  const offlineUnavailable=new Set(['#reports','#community','#work','#cityops','#study','#account']);
   function serviceTile([name,desc,href,mark]){
     const a=link('',href,'city-tile');
     const ornament=el('span',locale==='zh-CN'?mark:'','tile-mark');ornament.setAttribute('aria-hidden','true');
-    a.append(ornament,el('strong',name),el('small',desc),el('span','›','tile-arrow'));
+    a.append(ornament,el('strong',name),el('small',hosted&&href==='#pages'?'预览与保存本机草稿':desc),el('span','›','tile-arrow'));
     if(hosted&&(offlineUnavailable.has(href)||href.startsWith('#directory'))){a.append(el('small','需同源服务','tile-status'));if(offlineUnavailable.has(href)){a.removeAttribute('href');a.setAttribute('aria-disabled','true');}}
     return a;
   }
@@ -1442,15 +1445,23 @@
   }
   function community(ticket){return publishedPages(ticket,'本地社区 · 审核内容');}
   async function pages(ticket){
-    await publishedPages(ticket,'全民页面工厂');if(ticket!==archive)return;
-    const panel=$('view').querySelector('.sheet');const user=await api('session');if(ticket!==archive)return;
+    if(hosted){theme('village');sheet('全民页面工厂').append(el('p','公开版支持纯文本预览和本机草稿。发布与在线审核暂未开放。'));}
+    else await publishedPages(ticket,'全民页面工厂');
+    if(ticket!==archive)return;
+    const panel=$('view').querySelector('.sheet');const user=hosted?null:await api('session');if(ticket!==archive)return;
     const draft=el('article','','city-record');draft.append(el('h3','你的内容将在这里预览'),el('p','输入标题和正文，生成纯文本页面草稿。'));
     const title=field('title','页面标题');const detail=el('label','页面正文','app-field');const text=Object.assign(el('textarea'),{name:'detail',maxLength:2000,required:true,rows:5});detail.append(text);
     const source=field('source','内容来源',{max:500});
     const preview=()=>draft.replaceChildren(el('small','页面预览 · 未发布','record-kind'),el('h3',title.lastChild.value||'你的标题'),el('p',text.value||'你的正文'),el('small','来源：'+source.lastChild.value,'record-meta'));
     for(const input of [title.lastChild,text,source.lastChild])input.addEventListener('input',preview);
-    const form=taskForm([title,detail,source],'提交审核',async(data,status)=>{if(!['resident','merchant','admin'].includes(user?.role))throw Error('请先登录有投稿权限的账号。');const result=await api('submissions',{kind:'page',...data});status.textContent='已提交，审核编号 '+result.id+'。';});
-    panel.append(el('h3','创建自己的页面'),form,draft);if(!user)panel.append(link('登录后提交','#account','action'));
+    const draftKey='liyang.page.draft.v1';
+    const form=taskForm([title,detail,source],hosted?'保存本机草稿':'提交审核',async(data,status)=>{
+      if(hosted){const raw=JSON.stringify(data);if(storage(draftKey,raw)!==raw)throw Error('无法保存本机草稿。');status.textContent='草稿已保存在此浏览器，未提交或发布。';return;}
+      if(!['resident','merchant','admin'].includes(user?.role))throw Error('请先登录有投稿权限的账号。');
+      const result=await api('submissions',{kind:'page',...data});status.textContent='已提交，审核编号 '+result.id+'。';
+    });
+    if(hosted){try{const saved=JSON.parse(storage(draftKey));for(const [key,control] of Object.entries({title:title.lastChild,detail:text,source:source.lastChild}))if(typeof saved?.[key]==='string')control.value=saved[key].slice(0,control.maxLength);preview();}catch{}}
+    panel.append(el('h3','创建自己的页面'),form,draft);if(!hosted&&!user)panel.append(link('登录后提交','#account','action'));
   }
   function preferences(){
     theme('lake',{photo:true});const panel=sheet('我的主题与慢游偏好');panel.classList.add('city-service-sheet');
